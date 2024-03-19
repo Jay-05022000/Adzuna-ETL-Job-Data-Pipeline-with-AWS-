@@ -1,7 +1,7 @@
-                                                      Adzuna ETL Job Data Pipeline with AWS
+                                     Adzuna ETL Job Data Pipeline with AWS
 
 
-Aim: Establish a data pipeline using AWS Cloud Services and Python to retrieve details on data engineering and data analytics job opportunities in Canada through the Adzuna API. The project aims to provide users with timely and relevant job postings for personal job application needs and data analysis insights into various industries. 
+Aim: Establish a data pipeline using AWS Cloud Services and Python to retrieve details on data engineering and data analytics job opportunities in Canada through the Adzuna API.The designed pipeline can be configured to retrieve details of any job from any location globally.The project aims to provide users with timely and relevant job postings for personal job application needs and data analysis insights into various industries. 
 
 Tools and Technologies Used: AWS Cloud Services (Lambda, s3, Glue, Athena), Python, Jupyter Notebook
 
