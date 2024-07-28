@@ -46,7 +46,12 @@ def Job_Info(file):
           
           DF['City'] = DF['Location'].apply(lambda x: x[-1] if len(x) > 1 else "-")
           
-          DF = DF.iloc[:,[0,1,2,7,6,5,4,3]]  # Re-arrange column orders.
+          DF = DF.drop(['Location'], axis=1)  # Added # Drop 'Location' column.
+          
+          DF = DF.iloc[:,[0,1,2,6,5,4,3]]  # Added
+
+          
+          # DF = DF.iloc[:,[0,1,2,7,6,5,4,3]]  # Re-arrange column orders.
      
      return DF      
 
@@ -55,7 +60,7 @@ def Job_Info(file):
 def DE_handler():
      
      s3_object = boto3.client('s3')   
-     Bucket = "adzuna-etl-data-pipeline-project-jay-patel"
+     Bucket = "adzuna-latest"
      Key = "Raw_Data/To_Processed/DE_Jobs_Raw_Data/"
      
      Files = s3_object.list_objects(Bucket = Bucket,Prefix = Key)    # Get the list of all available files in the defined s3 folder.
@@ -74,20 +79,21 @@ def DE_handler():
                DE_Job_File_Keys.append(File_Key)                                   # Store key of accessed file into the list.
      
      for file in DE_Job_Files:
-          
+         
           DE_Jobs_df = Job_Info(file)
           
-          file_key = "Processed_Data/DE_Job_Postings/ " + "Transformed" + str(datetime.now()) + ".csv"   # Destination  of desired s3 folder to store file.
-          file_buffer = StringIO()                 
-          DE_Jobs_df.to_csv(file_buffer,index=False)                                                     # Convert dataframe into csv file.
+          file_key = "Processed_Data/DE_Job_postings/ " + "Transformed" +"_DE_Data"  + ".csv"   # Destination  of desired s3 folder to store file.
+          file_buffer = StringIO()                 # str(datetime.now())
+          DE_Jobs_df.to_csv(file_buffer,index=True)         # index=False  Removed                                          # Convert dataframe into csv file.
           DE_Job_Data  = file_buffer.getvalue()
           
-          s3_object.put_object(Bucket = "adzuna-etl-data-pipeline-project-jay-patel", Key = file_key, Body = DE_Job_Data)
+          s3_object.put_object(Bucket = "adzuna-latest", Key = file_key, Body = DE_Job_Data)
           s3 = boto3.client('s3')
           path = 'Raw_Data/Already_Processed/DE_Jobs_Already_Processed/'
           
+          
           for key in  DE_Job_File_Keys:
-               copy_source = {'Bucket': 'adzuna-etl-data-pipeline-project-jay-patel','Key': key}          # Source location of s3 from where file will be copied.
+               copy_source = {'Bucket': 'adzuna-latest','Key': key}          # Source location of s3 from where file will be copied.
                s3.copy_object(CopySource = copy_source,Bucket = Bucket, Key = path + key.split("/")[-1])  # Copy the file to destination folder.
                s3.delete_object(Bucket = Bucket,Key = key)                                                # Delete the file from source folder.
      
@@ -97,7 +103,7 @@ def DE_handler():
 def DA_handler():
      
      s3_object = boto3.client('s3')   
-     Bucket = "adzuna-etl-data-pipeline-project-jay-patel"
+     Bucket = "adzuna-latest"
      Key = "Raw_Data/To_Processed/DA_Jobs_Raw_Data/"
      
      Files = s3_object.list_objects(Bucket = Bucket,Prefix = Key)    
@@ -118,17 +124,17 @@ def DA_handler():
      for file in DA_Job_Files:
           
           DA_Jobs_df = Job_Info(file)
-          file_key = "Processed_Data/DA_Job_Postings/ " + "Transformed" + str(datetime.now()) + ".csv"
+          file_key = "Processed_Data/DA_Job_postings/ " + "Transformed" + "_DA_Data" + ".csv"  # str(datetime.now())
           
           file_buffer = StringIO()
-          DA_Jobs_df.to_csv(file_buffer,index=False)
+          DA_Jobs_df.to_csv(file_buffer,index=True)
           DA_Job_Data  = file_buffer.getvalue()
           
-          s3_object.put_object(Bucket = "adzuna-etl-data-pipeline-project-jay-patel", Key = file_key, Body = DA_Job_Data)
+          s3_object.put_object(Bucket = "adzuna-latest", Key = file_key, Body = DA_Job_Data)
           s3 = boto3.client('s3')
           path = 'Raw_Data/Already_Processed/DA_Jobs_Already_Processed/'
           for key in  DA_Job_File_Keys:
-              copy_source = {'Bucket': 'adzuna-etl-data-pipeline-project-jay-patel','Key': key}    # Define s3 source destination from where file will be copied. 
+              copy_source = {'Bucket': 'adzuna-latest','Key': key}    # Define s3 source destination from where file will be copied. 
               s3.copy_object(CopySource = copy_source,Bucket = Bucket, Key = path + key.split("/")[-1])  # Copy the file to destination folder.
               s3.delete_object(Bucket = Bucket,Key = key)  # Delete the file from source folder.
     
